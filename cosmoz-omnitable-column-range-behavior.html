@@ -132,6 +132,12 @@
 			return this._toInputString(value);
 		},
 
+		/**
+		 * Computes min/max range from values.
+		 *
+		 * @param  {Object} change `values` property changes
+		 * @returns {Object} Computed min/max
+		 */
 		_computeRange(change) {
 			const values = change.base,
 				comparableValues = Array.isArray(values) && values.length && values.map(i => this.getComparableValue(i)).filter(n => n != null);
