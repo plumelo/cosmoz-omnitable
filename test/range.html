@@ -44,8 +44,7 @@
 				date: new Date(2023, 3, 24),
 				time: ''
 			},
-			{ age: 5,
-				amount: { amount: 2, currency: 'AUD' },
+			{ amount: { amount: 2, currency: 'AUD' },
 				date: new Date('2015-03-18'),
 				time: '00:00'
 			},
@@ -106,10 +105,47 @@
 				done();
 			});
 
-			test('computes the value of an item', function (done) {
+			test('returns the value of an item', function (done) {
 				assert.equal(column.getComparableValue(data[0], 'age'), 17);
+				assert.equal(column.getComparableValue(data[1], 'age'), null);
+				assert.equal(column.getComparableValue(data[2], 'age'), -11);
 				done();
 			});
+
+			test('changing filter updates _filterInput', function (done) {
+				assert.isNull(column.filter.min);
+				assert.isNull(column.filter.max);
+				column.filter = {
+					min: 3,
+					max: 200
+				};
+				assert.equal(column._filterInput.min, 3);
+				assert.equal(column._filterInput.max, 200);
+				done();
+			});
+
+			test('changing _filterInput updates filter', function (done) {
+				assert.isNull(column._filterInput.min);
+				assert.isNull(column._filterInput.max);
+				column._filterInput = {
+					min: -10,
+					max: 15
+				};
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min, -10);
+					assert.equal(column.filter.max, 15);
+					done();
+				}, 650);
+			});
+
+			test('changing only _filterInput min updates filter min', function (done) {
+				column._filterInput.min = -21;
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min, -21);
+					done();
+				}, 650);
+			});
+
 		});
 	}());
 

@@ -63,12 +63,16 @@
 			'_filterChanged(filter.*)'
 		],
 
+		detached() {
+			this.cancelDebouncer('_limitInput');
+		},
+
 		/**
 		 * Converts a value to number optionaly limiting it.
 		 *
 		 * @param  {Number|*} value  The value to convert to number
 		 * @param  {Number|*} limit  The value used to limit the number
-		 * @param  {type} limitFunc  The function used to limit the number (Math.min|Math.max)
+		 * @param  {Function} limitFunc  The function used to limit the number (Math.min|Math.max)
 		 * @returns {Number|void}    Value converted to Number or void
 		 */
 		toNumber(value, limit, limitFunc) {
@@ -93,6 +97,13 @@
 			return this.toNumber.apply(this, arguments);
 		},
 
+		/**
+		 *   Get the comparable value of an item.
+		 *
+		 * @param  {Object} item       Item to be processed
+		 * @param  {String} valuePath  Property path
+		 * @returns {Number|void}      Valid value or void
+		 */
 		getComparableValue(item, valuePath) {
 			if (item == null) {
 				return;
@@ -240,6 +251,12 @@
 			};
 		},
 
+		/**
+		 * Observes changes of _filterInput, saves the path, debounces _limitInput.
+		 *
+		 * @param  {Object} change '_filterInput' property changes
+		 * @returns {void}
+		 */
 		_filterInputChanged(change) {
 			const path = change.path.split('.')[1];
 			this.__inputChangePath = path || null;
