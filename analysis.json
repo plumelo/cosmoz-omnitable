@@ -13015,23 +13015,25 @@
         },
         {
           "name": "getString",
-          "description": "",
+          "description": "Get date of item as string",
           "privacy": "public",
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 93,
+              "line": 102,
               "column": 2
             },
             "end": {
-              "line": 102,
+              "line": 111,
               "column": 3
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "item"
+              "name": "item",
+              "type": "Object",
+              "description": "Item to be processed"
             },
             {
               "name": "valuePath = this.valuePath"
@@ -13040,6 +13042,10 @@
               "name": "formatter = this.formatter"
             }
           ],
+          "return": {
+            "type": "String",
+            "desc": "Date rendered as string or 'Invalid Date'"
+          },
           "inheritedFrom": "Cosmoz.DateColumnBehaviorImpl"
         },
         {
@@ -13739,11 +13745,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 104,
+              "line": 113,
               "column": 2
             },
             "end": {
-              "line": 110,
+              "line": 119,
               "column": 3
             }
           },
@@ -13924,11 +13930,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 116,
+              "line": 125,
               "column": 2
             },
             "end": {
-              "line": 122,
+              "line": 131,
               "column": 3
             }
           },
@@ -14121,11 +14127,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 112,
+              "line": 121,
               "column": 2
             },
             "end": {
-              "line": 114,
+              "line": 123,
               "column": 3
             }
           },
@@ -14144,11 +14150,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 124,
+              "line": 133,
               "column": 2
             },
             "end": {
-              "line": 135,
+              "line": 144,
               "column": 3
             }
           },
@@ -14167,11 +14173,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 137,
+              "line": 146,
               "column": 2
             },
             "end": {
-              "line": 149,
+              "line": 158,
               "column": 3
             }
           },
@@ -24068,23 +24074,25 @@
         },
         {
           "name": "getString",
-          "description": "",
+          "description": "Get date of item as string",
           "privacy": "public",
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 93,
+              "line": 102,
               "column": 2
             },
             "end": {
-              "line": 102,
+              "line": 111,
               "column": 3
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "item"
+              "name": "item",
+              "type": "Object",
+              "description": "Item to be processed"
             },
             {
               "name": "valuePath = this.valuePath"
@@ -24093,6 +24101,10 @@
               "name": "formatter = this.formatter"
             }
           ],
+          "return": {
+            "type": "String",
+            "desc": "Date rendered as string or 'Invalid Date'"
+          },
           "inheritedFrom": "Cosmoz.DateColumnBehaviorImpl"
         },
         {
@@ -24793,11 +24805,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 104,
+              "line": 113,
               "column": 2
             },
             "end": {
-              "line": 110,
+              "line": 119,
               "column": 3
             }
           },
@@ -25178,11 +25190,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 124,
+              "line": 133,
               "column": 2
             },
             "end": {
-              "line": 135,
+              "line": 144,
               "column": 3
             }
           },
@@ -25201,11 +25213,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 137,
+              "line": 146,
               "column": 2
             },
             "end": {
-              "line": 149,
+              "line": 158,
               "column": 3
             }
           },
@@ -26904,23 +26916,25 @@
         },
         {
           "name": "getString",
-          "description": "",
+          "description": "Get date of item as string",
           "privacy": "public",
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 93,
+              "line": 102,
               "column": 2
             },
             "end": {
-              "line": 102,
+              "line": 111,
               "column": 3
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "item"
+              "name": "item",
+              "type": "Object",
+              "description": "Item to be processed"
             },
             {
               "name": "valuePath = this.valuePath"
@@ -26929,6 +26943,10 @@
               "name": "formatter = this.formatter"
             }
           ],
+          "return": {
+            "type": "String",
+            "desc": "Date rendered as string or 'Invalid Date'"
+          },
           "inheritedFrom": "Cosmoz.DateColumnBehaviorImpl"
         },
         {
@@ -27628,11 +27646,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 104,
+              "line": 113,
               "column": 2
             },
             "end": {
-              "line": 110,
+              "line": 119,
               "column": 3
             }
           },
@@ -28025,11 +28043,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 124,
+              "line": 133,
               "column": 2
             },
             "end": {
-              "line": 135,
+              "line": 144,
               "column": 3
             }
           },
@@ -28048,11 +28066,11 @@
           "sourceRange": {
             "file": "cosmoz-omnitable-column-date-behavior.html",
             "start": {
-              "line": 137,
+              "line": 146,
               "column": 2
             },
             "end": {
-              "line": 149,
+              "line": 158,
               "column": 3
             }
           },
@@ -35014,22 +35032,24 @@
             },
             {
               "name": "getString",
-              "description": "",
+              "description": "Get date of item as string",
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 93,
+                  "line": 102,
                   "column": 2
                 },
                 "end": {
-                  "line": 102,
+                  "line": 111,
                   "column": 3
                 }
               },
               "metadata": {},
               "params": [
                 {
-                  "name": "item"
+                  "name": "item",
+                  "type": "Object",
+                  "description": "Item to be processed"
                 },
                 {
                   "name": "valuePath = this.valuePath"
@@ -35037,7 +35057,11 @@
                 {
                   "name": "formatter = this.formatter"
                 }
-              ]
+              ],
+              "return": {
+                "type": "String",
+                "desc": "Date rendered as string or 'Invalid Date'"
+              }
             },
             {
               "name": "renderValue",
@@ -35045,11 +35069,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 104,
+                  "line": 113,
                   "column": 2
                 },
                 "end": {
-                  "line": 110,
+                  "line": 119,
                   "column": 3
                 }
               },
@@ -35069,11 +35093,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 112,
+                  "line": 121,
                   "column": 2
                 },
                 "end": {
-                  "line": 114,
+                  "line": 123,
                   "column": 3
                 }
               },
@@ -35090,11 +35114,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 116,
+                  "line": 125,
                   "column": 2
                 },
                 "end": {
-                  "line": 122,
+                  "line": 131,
                   "column": 3
                 }
               },
@@ -35111,11 +35135,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 124,
+                  "line": 133,
                   "column": 2
                 },
                 "end": {
-                  "line": 135,
+                  "line": 144,
                   "column": 3
                 }
               },
@@ -35132,11 +35156,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 137,
+                  "line": 146,
                   "column": 2
                 },
                 "end": {
-                  "line": 149,
+                  "line": 158,
                   "column": 3
                 }
               },
@@ -35157,7 +35181,7 @@
               "column": 1
             },
             "end": {
-              "line": 150,
+              "line": 159,
               "column": 3
             }
           },
@@ -35707,22 +35731,24 @@
             },
             {
               "name": "getString",
-              "description": "",
+              "description": "Get date of item as string",
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 93,
+                  "line": 102,
                   "column": 2
                 },
                 "end": {
-                  "line": 102,
+                  "line": 111,
                   "column": 3
                 }
               },
               "metadata": {},
               "params": [
                 {
-                  "name": "item"
+                  "name": "item",
+                  "type": "Object",
+                  "description": "Item to be processed"
                 },
                 {
                   "name": "valuePath = this.valuePath"
@@ -35731,6 +35757,10 @@
                   "name": "formatter = this.formatter"
                 }
               ],
+              "return": {
+                "type": "String",
+                "desc": "Date rendered as string or 'Invalid Date'"
+              },
               "inheritedFrom": "Cosmoz.DateColumnBehaviorImpl"
             },
             {
@@ -35739,11 +35769,11 @@
               "privacy": "public",
               "sourceRange": {
                 "start": {
-                  "line": 104,
+                  "line": 113,
                   "column": 2
                 },
                 "end": {
-                  "line": 110,
+                  "line": 119,
                   "column": 3
                 }
               },
@@ -35968,11 +35998,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 116,
+                  "line": 125,
                   "column": 2
                 },
                 "end": {
-                  "line": 122,
+                  "line": 131,
                   "column": 3
                 }
               },
@@ -36247,11 +36277,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 112,
+                  "line": 121,
                   "column": 2
                 },
                 "end": {
-                  "line": 114,
+                  "line": 123,
                   "column": 3
                 }
               },
@@ -36269,11 +36299,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 124,
+                  "line": 133,
                   "column": 2
                 },
                 "end": {
-                  "line": 135,
+                  "line": 144,
                   "column": 3
                 }
               },
@@ -36291,11 +36321,11 @@
               "privacy": "protected",
               "sourceRange": {
                 "start": {
-                  "line": 137,
+                  "line": 146,
                   "column": 2
                 },
                 "end": {
-                  "line": 149,
+                  "line": 158,
                   "column": 3
                 }
               },
@@ -36313,11 +36343,11 @@
           "metadata": {},
           "sourceRange": {
             "start": {
-              "line": 152,
+              "line": 161,
               "column": 1
             },
             "end": {
-              "line": 152,
+              "line": 161,
               "column": 89
             }
           },
