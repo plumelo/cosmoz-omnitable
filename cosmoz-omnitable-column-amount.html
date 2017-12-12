@@ -94,11 +94,11 @@
 								currency
 							})
 						}), {
-							[this.defaultCurrency]: new Intl.NumberFormat(locale || undefined, {
-								style: 'currency',
-								currency: this.defaultCurrency
-							})
-						});
+						[this.defaultCurrency]: new Intl.NumberFormat(locale || undefined, {
+							style: 'currency',
+							currency: this.defaultCurrency
+						})
+					});
 			},
 
 			/**
