@@ -22,9 +22,9 @@
 			<cosmoz-omnitable id="omnitable" class="flex">
 				<cosmoz-omnitable-column-number title="Age" name="age" value-path="age">
 				</cosmoz-omnitable-column-number>
-				<cosmoz-omnitable-column-amount id="amount" name="amount" title="Amount" value-path="amount">
+				<cosmoz-omnitable-column-amount title="Amount" name="amount" value-path="amount">
 				</cosmoz-omnitable-column-amount>
-				<cosmoz-omnitable-column-date id="date" name="date" title="Date" value-path="date" editable>
+				<cosmoz-omnitable-column-date title="Date" name="date" value-path="date" editable>
 				</cosmoz-omnitable-column-date>
 				<cosmoz-omnitable-column-datetime title="Datetime" name="datetime" value-path="date" editable>
 				</cosmoz-omnitable-column-datetime>
@@ -40,16 +40,16 @@
 		'use strict';
 		const data = [
 			{ age: 17,
-				amount: { amount: 12.4, currency: 'USD' },
+				amount: { amount: '12.4', currency: 'USD' },
 				date: new Date(2023, 3, 24),
 				time: ''
 			},
-			{ amount: { amount: 2, currency: 'AUD' },
+			{ amount: { amount: 2 },
 				date: new Date('2015-03-18'),
 				time: '00:00'
 			},
 			{ age: -11,
-				amount: { amount: 678, currency: 'SEK' },
+				amount: { amount: 678, currency: 'AUD' },
 				date: new Date(86400000), // Fri Jan 02 1970 02:00:00 GMT+0200 (EET)
 				time: '10:17'
 			},
@@ -57,7 +57,13 @@
 				amount: { amount: -8, currency: 'EUR' },
 				date: new Date(99, 5, 24, 11, 33, 30, 0), // Thu Jun 24 1999 11:33:30 GMT+0300 (EEST)
 				time: '11:00'
-			}
+			},
+			{
+				age: 5,
+				amount: { amount: '3450', currency: 'DKK' },
+				date: new Date('2016-08-27'),
+				time: '17:34'
+			},
 		];
 
 		sinon.assert.expose(chai.assert, { prefix: '' });
@@ -144,6 +150,74 @@
 					assert.equal(column.filter.min, -21);
 					done();
 				}, 650);
+			});
+
+		});
+
+		suite('amount', function () {
+			let omnitable,
+				column;
+
+			setup(function (done) {
+				omnitable = fixture('range');
+				omnitable.data = data;
+				Polymer.Base.async(function () {
+					column = omnitable.columns[1];
+					done();
+				}, 120);
+			});
+
+			test('instantiates a cosmoz-omnitable-column-amount', function (done) {
+				assert.equal(column.is, 'cosmoz-omnitable-column-amount');
+				done();
+			});
+
+			test('toAmount returns default currency', function (done) {
+				assert.equal(column.toAmount(123).currency, 'SEK');
+				assert.equal(column.toAmount(data[1].amount).currency, 'SEK');
+				done();
+			});
+
+			test('toAmount returns the specificated currency', function (done) {
+				assert.equal(column.toAmount(data[0].amount).currency, 'USD');
+				assert.equal(column.toAmount(data[2].amount).currency, 'AUD');
+				assert.equal(column.toAmount(data[3].amount).currency, 'EUR');
+				done();
+			});
+
+			test('toAmount converts a amount to a number', function (done) {
+				assert.equal(column.toAmount(123).amount, 123);
+				assert.equal(column.toAmount('2300').amount, 2300);
+				assert.isObject(column.toAmount(data[0].amount)); // amount is Object
+				assert.equal(column.toAmount(data[0].amount).amount, 12.4); // string value to number
+				done();
+			});
+
+			test('toAmount limits parameters value', function (done) {
+				assert.equal(column.toAmount('-2.0014', 4).amount, -2.0014);
+				assert.equal(column.toAmount(3, 2, Math.min).amount, 2);
+				assert.equal(column.toAmount('23.3', '-10.5443', Math.min).amount, -10.5443);
+				assert.equal(column.toAmount(3, '2.0014', Math.min).amount, 2.0014);
+				assert.equal(column.toAmount(3, 2.0014, Math.max).amount, 3);
+				done();
+			});
+
+			test('returns comparable value', function (done) {
+				assert.equal(column.getComparableValue(data[3], 'amount'), -8);
+				assert.equal(column.getComparableValue(data[4], 'amount'), 3450);
+				done();
+			});
+
+			test('amount renders symbol and value', function (done) {
+				assert.equal(column.renderValue(data[0].amount), '$12.40');
+				assert.equal(column.renderValue(data[1].amount), 'kr2'); // use of default currency when is null
+				assert.equal(column.renderValue(data[3].amount), '-€8.00');
+				done();
+			});
+
+			test('computes array of formaters', function (done) {
+				assert.deepEqual(Object.keys(column._formatters), ['SEK', 'USD', 'AUD', 'EUR', 'DKK']);
+				done();
 			});
 
 		});

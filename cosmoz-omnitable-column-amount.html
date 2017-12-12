@@ -94,11 +94,11 @@
 								currency
 							})
 						}), {
-						[this.defaultCurrency]: new Intl.NumberFormat(locale || undefined, {
-							style: 'currency',
-							currency: this.defaultCurrency
-						})
-					});
+							[this.defaultCurrency]: new Intl.NumberFormat(locale || undefined, {
+								style: 'currency',
+								currency: this.defaultCurrency
+							})
+						});
 			},
 
 			/**
@@ -143,6 +143,13 @@
 				return this.getString(item, valuePath);
 			},
 
+			/**
+			 *   Get the comparable value of an item.
+			 *
+			 * @param  {Object} item       Item to be processed
+			 * @param  {String} valuePath  Property path
+			 * @returns {Number|void}      Valid value or void
+			 */
 			getComparableValue(item, valuePath) {
 				const value = Cosmoz.RangeColumnBehavior.getComparableValue.call(this, item, valuePath);
 				if (value == null) {
@@ -156,13 +163,20 @@
 				return value && value.currency;
 			},
 
+			/**
+			 * Converts an amount to symbol and value to be rendered.
+			 *
+			 * @param  {Object} value Amount to be formated
+			 * @param  {Object} _formatters = this._formatters All possible formatters.
+			 * @returns {String} Formated value or empty string.
+			 */
 			renderValue(value, _formatters = this._formatters) {
 				if (!value || !_formatters) {
 					return '';
 				}
 				const formatter = _formatters[value.currency];
 				if (!formatter) {
-					console.warn('formatter not found');
+					console.warn('formatter not found', value);
 					return '';
 				}
 				return formatter.format(value.amount);
