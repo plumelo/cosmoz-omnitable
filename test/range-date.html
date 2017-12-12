@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+	<title>cosmoz-omnitable rangeColumnBehavior tests</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+	<script src="../../web-component-tester/browser.js"></script>
+	<script src="../../test-fixture/test-fixture-mocha.js"></script>
+
+	<link rel="import" href="../../test-fixture/test-fixture.html">
+	<link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
+
+	<link rel="import" href="../cosmoz-omnitable.html">
+	<link rel="import" href="../cosmoz-omnitable-columns.html">
+	<link rel="import" href="../demo/table-demo-behavior.html">
+</head>
+<body>
+	<test-fixture id="range">
+		<template>
+			<cosmoz-omnitable id="omnitable" class="flex">
+				<cosmoz-omnitable-column-number title="Age" name="age" value-path="age">
+				</cosmoz-omnitable-column-number>
+				<cosmoz-omnitable-column-amount title="Amount" name="amount" value-path="amount">
+				</cosmoz-omnitable-column-amount>
+				<cosmoz-omnitable-column-date title="Date" name="date" value-path="date" editable>
+				</cosmoz-omnitable-column-date>
+				<cosmoz-omnitable-column-datetime title="Datetime" name="datetime" value-path="date" editable>
+				</cosmoz-omnitable-column-datetime>
+				<cosmoz-omnitable-column-time title="Time" name="time" value-path="time" editable>
+				</cosmoz-omnitable-column-time>
+			</cosmoz-omnitable>
+		</template>
+	</test-fixture>
+
+	<script>
+	/*global sinon chai flush */
+	(function () {
+		'use strict';
+		const data = [
+			{ age: 17,
+				amount: { amount: '12.4', currency: 'USD' },
+				date: '2023 3 21',
+				time: ''
+			},
+			{ amount: { amount: 2 },
+				date: new Date('2015-03-18'),
+				time: '00:00'
+			},
+			{ age: -11,
+				amount: { amount: 678, currency: 'AUD' },
+				date: new Date(86400000), // Fri Jan 02 1970 02:00:00 GMT+0200 (EET)
+				time: '10:17'
+			},
+			{ age: 9,
+				amount: { amount: -8, currency: 'EUR' },
+				date: new Date(99, 5, 24, 11, 33, 30, 0), // Thu Jun 24 1999 11:33:30 GMT+0300 (EEST)
+				time: '11:00'
+			},
+			{
+				age: 5,
+				amount: { amount: '3450', currency: 'DKK' },
+				date: new Date('2016-08-27'),
+				time: '17:34'
+			},
+		];
+
+		sinon.assert.expose(chai.assert, { prefix: '' });
+
+		suite('date', function () {
+			let omnitable,
+				column;
+
+			setup(function (done) {
+				omnitable = fixture('range');
+				omnitable.data = data;
+				Polymer.Base.async(function () {
+					column = omnitable.columns[2];
+					done();
+				}, 90);
+			});
+
+			test('instantiates a cosmoz-omnitable-column-date', function (done) {
+				assert.equal(column.is, 'cosmoz-omnitable-column-date');
+				done();
+			});
+
+			test('toDate converts an value to valid date', function (done) {
+				assert.equal(column.toDate(data[0].date).getTime(), (new Date('2023 3 21')).getTime());
+				assert.equal(column.toDate(data[1].date).getTime(), (new Date('2015-03-18')).getTime());
+				assert.equal(column.toDate(data[2].date).getTime(), (new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)')).getTime());
+				done();
+			});
+
+			test('toDate limits parameters', function (done) {
+				assert.equal(column.toDate(data[0].date, '2023 4 21', Math.min), (new Date('2023 3 21')).getTime()); // min
+				assert.equal(column.toDate(data[1].date, '2053 4 21', Math.min), (new Date('2015-03-18')).getTime()); // min
+				assert.equal(column.toDate(data[0].date, (new Date('2023 4 21')).getTime(), Math.max), (new Date('2023 4 21')).getTime()); //max
+				assert.equal(column.toDate(data[1].date, '2017-03-18').getTime(), (new Date('2015-03-18')).getTime()); // missing limitFunc returns date
+				done();
+			});
+
+			test('date returns comparable values', function (done) {
+				assert.typeOf(column.getComparableValue(data[0].date), 'number');
+				assert.typeOf(column.getComparableValue(data[1].date), 'number');
+				assert.typeOf(column.getComparableValue(data[2].date), 'number');
+				done();
+			});
+		});
+	}());
+
+	</script>
+</body>
+</html>

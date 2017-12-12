@@ -48,6 +48,14 @@
 			}
 		},
 
+		/**
+		 * Converts an value to date optionaly limiting it.
+		 *
+		 * @param  {Date|String} value   Value to convert to date
+		 * @param  {Date|String} limit   Value used to limit the date
+		 * @param  {Function} limitFunc  Function used to limit the date (Math.min|Math.max)
+		 * @returns {Date|void} Value converted to date optionaly limitated
+		 */
 		toDate(value, limit, limitFunc) {
 			if (value == null || value === '') {
 				return;
@@ -70,6 +78,11 @@
 			return this.toDate.apply(this, arguments);
 		},
 
+		/**
+		 * Get comparable number from date
+		 *
+		 * @returns {Number|void} Valid value or void
+		 */
 		getComparableValue() {
 			const value = Cosmoz.RangeColumnBehavior.getComparableValue.apply(this, arguments);
 			if (value == null) {
