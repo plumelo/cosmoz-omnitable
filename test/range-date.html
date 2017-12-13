@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>cosmoz-omnitable rangeColumnBehavior tests</title>
+	<title>cosmoz-omnitable range tests for date, datetime, time</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
@@ -45,25 +45,24 @@
 				time: ''
 			},
 			{ amount: { amount: 2 },
-				date: new Date('2015-03-18'),
-				time: '00:00'
+				date: new Date('2015-03-18')
 			},
 			{ age: -11,
 				amount: { amount: 678, currency: 'AUD' },
 				date: new Date(86400000), // Fri Jan 02 1970 02:00:00 GMT+0200 (EET)
-				time: '10:17'
+				time: 86400000
 			},
 			{ age: 9,
 				amount: { amount: -8, currency: 'EUR' },
 				date: new Date(99, 5, 24, 11, 33, 30, 0), // Thu Jun 24 1999 11:33:30 GMT+0300 (EEST)
-				time: '11:00'
+				time: '86400000'
 			},
 			{
 				age: 5,
 				amount: { amount: '3450', currency: 'DKK' },
 				date: new Date('2016-08-27'),
-				time: '17:34'
-			},
+				time: '08/27/2016 14:34:56'
+			}
 		];
 
 		sinon.assert.expose(chai.assert, { prefix: '' });
@@ -134,6 +133,72 @@
 				done();
 			});
 		});
+
+		suite('time', function () {
+			let omnitable,
+				column;
+
+			setup(function (done) {
+				omnitable = fixture('range');
+				omnitable.data = data;
+				Polymer.Base.async(function () {
+					column = omnitable.columns[4];
+					done();
+				}, 90);
+			});
+
+			test('instantiates a cosmoz-omnitable-column-time', function (done) {
+				assert.equal(column.is, 'cosmoz-omnitable-column-time');
+				done();
+			});
+
+			test('time toDate converts timestamp to valid date', function (done) {
+				assert.equal(column.toDate(data[0].time), null);
+				assert.equal(column.toDate(data[1].time), null);
+				assert.equal(column.toDate(data[2].time).getTime(), new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)').getTime());
+				assert.equal(column.toDate(data[3].time), new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)').getTime(), 'Expected to convert timestamp from string to date');
+				done();
+			});
+
+			test('time toDate accepts time as string and converts it to date', function (done) {
+				assert.equal(column.toDate(data[4].time).getTime(), (new Date('08/27/2016 14:34:56')).getTime());
+				done();
+			});
+
+			test('time toDate limits parameters', function (done) {
+				assert.equal(column.toDate(data[2].time, '2023 4 21 04:00:00', Math.min), (new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)')).getTime()); // min
+				assert.equal(column.toDate(data[2].time, '2053 4 21 11:23:32', Math.max), (new Date('2053 4 21 11:23:32')).getTime()); // max
+				assert.equal(column.toDate(data[4].time, (new Date('2023 4 21 04:00:00')).getTime(), Math.min), (new Date('08/27/2016 14:34:56')).getTime()); //min
+				assert.equal(column.toDate(data[4].time, (new Date('2023 4 21 11:23:32')).getTime(), Math.max), (new Date('2023 4 21 11:23:32')).getTime()); //max
+				assert.equal(column.toDate(data[4].time, '2017-03-18 11:23:32').getTime(), (new Date('08/27/2016 14:34:56')).getTime()); // missing limitFunc returns date
+				done();
+			});
+
+			test('time toDate accepts limit as timestamp', function (done) {
+				assert.equal(column.toDate(new Date('Fri Jan 02 2029 02:00:00 GMT+0200 (EET)'), data[2].time, Math.min), data[2].time);
+				// assert.equal(column.toDate(new Date('Fri Jan 02 2029 02:00:00 GMT+0200 (EET)'), data[3].time, Math.min).getTime(), data[3].time); limit as string - timestamp
+				done();
+			});
+
+			test('time getComparableValue returns right value', function (done) {
+				assert.equal(column.getComparableValue(data[2], 'time'), (new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)')).getTime(), 'Expected to parse time from miliseconds timestamp as number');
+				assert.equal(column.getComparableValue(data[4], 'time'), (new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)')).getTime());
+				done();
+			});
+
+			test('time _toInputString returns local ISO string', function (done) {
+				assert.equal(column._toInputString(), null);
+				assert.equal(column._toInputString(data[2].time), '02:00:00');
+				assert.equal(column._toInputString(data[4].time), '14:34:56');
+				done();
+			});
+
+			test('time _toHashString converts time to UTC string replacing : with .', function (done) {
+				assert.equal(column._toHashString(data[2].time), '00.00.00');
+				done();
+			});
+		});
+
 	}());
 
 	</script>
