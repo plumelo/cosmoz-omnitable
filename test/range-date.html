@@ -234,7 +234,7 @@
 				assert.equal(column.toDate(data[0].time), null);
 				assert.equal(column.toDate(data[1].time), null);
 				assert.equal(column.toDate(data[2].time).getTime(), new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)').getTime());
-				assert.equal(column.toDate(data[3].time), new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)').getTime(), 'Expected to convert timestamp from string to date');
+				assert.isNull(column.toDate(data[3].time));
 				done();
 			});
 
@@ -259,8 +259,8 @@
 			});
 
 			test('time getComparableValue returns right value', function (done) {
-				assert.equal(column.getComparableValue(data[2], 'time'), (new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)')).getTime(), 'Expected to parse time from miliseconds timestamp as number');
-				assert.equal(column.getComparableValue(data[4], 'time'), (new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)')).getTime());
+				assert.equal(column.getComparableValue(data[2], 'time'), 0, 'Expected to parse time from miliseconds timestamp as number');
+				assert.equal(column.getComparableValue(data[4], 'time'), 45296000);
 				done();
 			});
 
