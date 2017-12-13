@@ -210,7 +210,7 @@
 
 			test('amount renders symbol and value', function (done) {
 				assert.equal(column.renderValue(data[0].amount), '$12.40');
-				assert.equal(column.renderValue(data[1].amount), 'kr2'); // use of default currency when is null
+				assert.equal(column.renderValue(data[1].amount), 'Invalid value', 'Expected missing currency to be treated as invalid.');
 				assert.equal(column.renderValue(data[3].amount), '-€8.00');
 				done();
 			});

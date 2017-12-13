@@ -121,16 +121,94 @@
 				done();
 			});
 
+			test('changing filter updates _filterInput', function (done) {
+				assert.isNull(column.filter.min);
+				assert.isNull(column.filter.max);
+				column.filter = {
+					min: data[1].date,
+					max: data[0].date
+				};
+				assert.equal(column._filterInput.min, '2015-03-18');
+				assert.equal(column._filterInput.max, '2023-03-21');
+				done();
+			});
+
+			test('changing _filterInput updates filter', function (done) {
+				assert.isNull(column._filterInput.min);
+				assert.isNull(column._filterInput.max);
+				column._filterInput = {
+					min: '2015-03-18',
+					max: '2023-03-21'
+				};
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min.getTime(), new Date('2015-03-18').getTime());
+					assert.equal(column.filter.max.getTime(), new Date('2023-03-21').getTime());
+					done();
+				}, 650);
+			});
+
+			test('changing only _filterInput min updates filter min', function (done) {
+				column._filterInput.min = '2015-08-27';
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min.getTime(), new Date('2015-08-27').getTime());
+					done();
+				}, 650);
+			});
+		});
+
+		suite('datetime', function () {
+			let omnitable,
+				column;
+
+			setup(function (done) {
+				omnitable = fixture('range');
+				omnitable.data = data;
+				Polymer.Base.async(function () {
+					column = omnitable.columns[3];
+					done();
+				}, 90);
+			});
+
 			test('_toInputString converts datetime to local string', function (done) {
-				column = omnitable.columns[3]; // datetime
 				assert.equal(column._toInputString(data[2].date), '1970-01-02T02:00:00');
 				done();
 			});
 
 			test('_toHashString converts datetime to UTC string replacing : with .', function (done) {
-				column = omnitable.columns[3]; // datetime
 				assert.equal(column._toHashString(data[2].date), '1970-01-02T00.00.00');
 				done();
+			});
+
+			test('changing filter updates _filterInput', function (done) {
+				assert.isNull(column.filter.min);
+				assert.isNull(column.filter.max);
+				column.filter = {
+					min: data[2].date,
+					max: data[3].date
+				};
+				assert.equal(column._filterInput.min, '1970-01-02T02:00:00');
+				assert.equal(column._filterInput.max, '1999-06-24T11:33:30');
+				done();
+			});
+
+			test('changing _filterInput updates filter', function (done) {
+				column._filterInput = {
+					min: '1970-01-02T02:00:00',
+					max: '1999-06-24T11:33:30'
+				};
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min.getTime(), 86400000);
+					assert.equal(column.filter.max.getTime(), data[3].date.getTime());
+					done();
+				}, 650);
+			});
+
+			test('changing only _filterInput min updates filter min', function (done) {
+				column._filterInput.min = '2015-08-27';
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min.getTime(), new Date('2015-08-27').getTime());
+					done();
+				}, 650);
 			});
 		});
 
@@ -197,6 +275,7 @@
 				assert.equal(column._toHashString(data[2].time), '00.00.00');
 				done();
 			});
+
 		});
 
 	}());
