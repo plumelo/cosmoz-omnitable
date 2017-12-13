@@ -204,9 +204,9 @@
 			});
 
 			test('changing only _filterInput min updates filter min', function (done) {
-				column._filterInput.min = '2015-08-27';
+				column._filterInput.min = '2014-06-24T11:33:30';
 				Polymer.Base.async(function () {
-					assert.equal(column.filter.min.getTime(), new Date('2015-08-27').getTime());
+					assert.equal(column.filter.min.getTime(), new Date('2014-06-24T11:33:30').getTime());
 					done();
 				}, 650);
 			});
@@ -274,6 +274,40 @@
 			test('time _toHashString converts time to UTC string replacing : with .', function (done) {
 				assert.equal(column._toHashString(data[2].time), '00.00.00');
 				done();
+			});
+
+			test('changing filter updates _filterInput', function (done) {
+				assert.isNull(column.filter.min);
+				assert.isNull(column.filter.max);
+				column.filter = {
+					min: data[2].time,
+					max: data[4].time
+				};
+				assert.equal(column._filterInput.min, '02:00:00');
+				assert.equal(column._filterInput.max, '14:34:56');
+				done();
+			});
+
+			test('changing _filterInput updates filter', function (done) {
+				assert.isNull(column._filterInput.min);
+				assert.isNull(column._filterInput.max);
+				column._filterInput = {
+					min: '03:10:00',
+					max: '14:34:56'
+				};
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min.getTime(), new Date('Thu, 01 Jan 1970 01:10:00 GMT').getTime());
+					assert.equal(column.filter.max.getTime(), new Date('Thu, 01 Jan 1970 12:34:56 GMT').getTime());
+					done();
+				}, 650);
+			});
+
+			test('changing only _filterInput min updates filter min', function (done) {
+				column._filterInput.min = '04:21:10';
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min.getTime(), new Date('Thu, 01 Jan 1970 02:21:10 GMT').getTime());
+					done();
+				}, 650);
 			});
 
 		});
