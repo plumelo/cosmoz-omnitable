@@ -24,12 +24,6 @@
 				</cosmoz-omnitable-column-number>
 				<cosmoz-omnitable-column-amount title="Amount" name="amount" value-path="amount">
 				</cosmoz-omnitable-column-amount>
-				<cosmoz-omnitable-column-date title="Date" name="date" value-path="date" editable>
-				</cosmoz-omnitable-column-date>
-				<cosmoz-omnitable-column-datetime title="Datetime" name="datetime" value-path="date" editable>
-				</cosmoz-omnitable-column-datetime>
-				<cosmoz-omnitable-column-time title="Time" name="time" value-path="time" editable>
-				</cosmoz-omnitable-column-time>
 			</cosmoz-omnitable>
 		</template>
 	</test-fixture>
@@ -39,30 +33,24 @@
 	(function () {
 		'use strict';
 		const data = [
-			{ age: 17,
+			{
+				age: 17,
 				amount: { amount: '12.4', currency: 'USD' },
-				date: new Date(2023, 3, 24),
-				time: ''
 			},
-			{ amount: { amount: 2 },
-				date: new Date('2015-03-18'),
-				time: '00:00'
+			{
+				amount: { amount: 2 }
 			},
-			{ age: -11,
-				amount: { amount: 678, currency: 'AUD' },
-				date: new Date(86400000), // Fri Jan 02 1970 02:00:00 GMT+0200 (EET)
-				time: '10:17'
+			{
+				age: -11,
+				amount: { amount: 678, currency: 'AUD' }
 			},
-			{ age: 9,
-				amount: { amount: -8, currency: 'EUR' },
-				date: new Date(99, 5, 24, 11, 33, 30, 0), // Thu Jun 24 1999 11:33:30 GMT+0300 (EEST)
-				time: '11:00'
+			{
+				age: 9,
+				amount: { amount: -8, currency: 'EUR' }
 			},
 			{
 				age: 5,
-				amount: { amount: '3450', currency: 'DKK' },
-				date: new Date('2016-08-27'),
-				time: '17:34'
+				amount: { amount: '3450', currency: 'DKK' }
 			},
 		];
 
@@ -112,7 +100,8 @@
 			});
 
 			test('returns the value of an item', function (done) {
-				assert.equal(column.getComparableValue(data[0], 'age'), 17);
+				assert.equal(column.getComparableValue({age: '13'}, 'age'), 13);
+				assert.equal(column.getComparableValue(13), 13);
 				assert.equal(column.getComparableValue(data[1], 'age'), null);
 				assert.equal(column.getComparableValue(data[2], 'age'), -11);
 				done();
@@ -152,6 +141,28 @@
 				}, 650);
 			});
 
+			test('changing out of range _filterInput limits _filterInput', function (done) {
+				assert.isNull(column._filterInput.min);
+				assert.isNull(column._filterInput.max);
+
+				column._filterInput =  {min: -11, max: 17 };
+
+				Polymer.Base.async(function () {
+					assert.equal(column._filterInput.min, -11);
+					assert.equal(column._filterInput.max, 17);
+					assert.equal(column.filter.min, -11);
+					assert.equal(column.filter.max, 17);
+
+					column._filterInput.min = 20;
+
+					Polymer.Base.async(function () {
+						assert.equal(column.filter.min, -11);
+						done();
+					});
+
+				}, 650);
+			});
+
 		});
 
 		suite('amount', function () {
@@ -174,7 +185,7 @@
 
 			test('toAmount returns default currency', function (done) {
 				assert.equal(column.toAmount(123).currency, 'SEK');
-				assert.equal(column.toAmount(data[1].amount).currency, 'SEK');
+				assert.equal(column.toAmount({amount: 23}).currency, 'SEK');
 				done();
 			});
 
@@ -205,10 +216,16 @@
 			test('returns comparable value', function (done) {
 				assert.equal(column.getComparableValue(data[3], 'amount'), -8);
 				assert.equal(column.getComparableValue(data[4], 'amount'), 3450);
+				assert.equal(column.getComparableValue({amount: '13'}), 13);
+				assert.isUndefined(column.getComparableValue({}));
+				assert.isUndefined(column.getComparableValue([]));
 				done();
 			});
 
 			test('amount renders symbol and value', function (done) {
+				assert.equal(column.renderValue(null), 'Invalid value');
+				assert.equal(column.renderValue({}), 'Invalid value');
+				assert.equal(column.renderValue([]), 'Invalid value');
 				assert.equal(column.renderValue(data[0].amount), '$12.40');
 				assert.equal(column.renderValue(data[1].amount), 'Invalid value', 'Expected missing currency to be treated as invalid.');
 				assert.equal(column.renderValue(data[3].amount), '-€8.00');
@@ -218,6 +235,63 @@
 			test('computes array of formaters', function (done) {
 				assert.deepEqual(Object.keys(column._formatters), ['SEK', 'USD', 'AUD', 'EUR', 'DKK']);
 				done();
+			});
+
+			//TODO: Add amount _filterInput and filter change tests
+			test('changing filter updates _filterInput', function (done) {
+				assert.isNull(column.filter.min);
+				assert.isNull(column.filter.max);
+				column.filter = {
+					min: {amount: 225, currency: 'EUR'},
+					max: {amount: 457, currency: 'EUR'}
+				};
+				assert.equal(column._filterInput.min, 225);
+				assert.equal(column._filterInput.max, 457);
+				done();
+			});
+
+			test('changing _filterInput updates filter', function (done) {
+				assert.isNull(column._filterInput.min);
+				assert.isNull(column._filterInput.max);
+				column._filterInput = {
+					min: 1,
+					max: 15
+				};
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min.amount, 1);
+					assert.equal(column.filter.max.amount, 15);
+					done();
+				}, 650);
+			});
+
+			test('changing only _filterInput min updates filter min', function (done) {
+				column._filterInput.min = -2317;
+				Polymer.Base.async(function () {
+					assert.equal(column.filter.min.amount, -2317);
+					done();
+				}, 650);
+			});
+
+			test('changing out of range _filterInput limits _filterInput', function (done) {
+				assert.isNull(column._filterInput.min);
+				assert.isNull(column._filterInput.max);
+
+				column._filterInput =  {min: 7, max: 77};
+
+				Polymer.Base.async(function () {
+					assert.equal(column._filterInput.min, 7);
+					assert.equal(column._filterInput.max, 77);
+					assert.equal(column.filter.min.amount, 7);
+					assert.equal(column.filter.max.amount, 77);
+
+					column._filterInput.min = 9992;
+
+					Polymer.Base.async(function () {
+						assert.equal(column.filter.min.amount, 7);
+						done();
+					});
+
+				}, 650);
 			});
 
 		});

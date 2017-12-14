@@ -41,11 +41,11 @@
 		const data = [
 			{ age: 17,
 				amount: { amount: '12.4', currency: 'USD' },
-				date: '2023-03-21T00:00:00Z',
+				date: '2023-03-21Z',
 				time: ''
 			},
 			{ amount: { amount: 2 },
-				date: new Date('2015-03-18T00:00:00Z')
+				date: new Date('2015-03-18Z')
 			},
 			{ age: -11,
 				amount: { amount: 678, currency: 'AUD' },
@@ -86,8 +86,8 @@
 			});
 
 			test('toDate converts an value to valid date', function (done) {
-				assert.equal(column.toDate(data[0].date).getTime(), new Date('2023-03-21T00:00:00Z').getTime());
-				assert.equal(column.toDate(data[1].date).getTime(), new Date('2015-03-18T00:00:00Z').getTime());
+				assert.equal(column.toDate(data[0].date).getTime(), new Date('2023-03-21Z').getTime());
+				assert.equal(column.toDate(data[1].date).getTime(), new Date('2015-03-18Z').getTime());
 				assert.equal(column.toDate(data[2].date).getTime(), new Date(Date.UTC(1970, 0, 2)).getTime());
 				done();
 			});
@@ -124,12 +124,18 @@
 			test('changing filter updates _filterInput', function (done) {
 				assert.isNull(column.filter.min);
 				assert.isNull(column.filter.max);
+
 				column.filter = {
-					min: data[1].date,
-					max: data[0].date
+					min: new Date('2015-03-18'),
+					max: new Date('2023-03-21')
 				};
-				assert.equal(new Date(column._filterInput.min).getTime(), new Date('2015-03-18T00:00:00Z').getTime());
-				assert.equal(new Date(column._filterInput.max).getTime(), new Date('2023-03-21T00:00:00Z').getTime());
+
+				assert.equal(column._filterInput.min, '2015-03-18', 'Expect _filterInput.min to be local ISO String');
+				assert.equal(column._filterInput.max, '2023-03-21', 'Expect _filterInput.max to be local ISO String');
+
+				assert.equal(new Date(column._filterInput.min).getTime(), column.filter.min.getTime(), 'Expect min input and filter to be equal as dates');
+				assert.equal(new Date(column._filterInput.max).getTime(), column.filter.max.getTime(), 'Expect max input and filter to be equal as dates');
+
 				done();
 			});
 
@@ -137,8 +143,8 @@
 				assert.isNull(column._filterInput.min);
 				assert.isNull(column._filterInput.max);
 				column._filterInput = {
-					min: '2015-03-18T00:00:00Z',
-					max: '2023-03-21T00:00:00Z'
+					min: '2015-03-18',
+					max: '2023-03-21'
 				};
 				Polymer.Base.async(function () {
 					assert.equal(column.filter.min.getTime(), new Date('2015-03-18T00:00:00Z').getTime());
@@ -148,7 +154,7 @@
 			});
 
 			test('changing only _filterInput min updates filter min', function (done) {
-				column._filterInput.min = '2015-08-27T00:00:00Z';
+				column._filterInput.min = '2015-08-27';
 				Polymer.Base.async(function () {
 					assert.equal(column.filter.min.getTime(), new Date('2015-08-27T00:00:00Z').getTime());
 					done();
