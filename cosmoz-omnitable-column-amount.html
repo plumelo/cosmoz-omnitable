@@ -171,8 +171,9 @@
 			 * @returns {String} Formated value or empty string.
 			 */
 			renderValue(value, _formatters = this._formatters) {
-				if (!value || !_formatters) {
-					return '';
+				let isEmpty = obj => !Object.keys(obj).length > 0 || !obj.currency;
+				if (!value || isEmpty(value) || !_formatters) {
+					return 'Invalid value';
 				}
 				const formatter = _formatters[value.currency];
 				if (!formatter) {
