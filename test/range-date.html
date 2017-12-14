@@ -24,7 +24,7 @@
 				</cosmoz-omnitable-column-number>
 				<cosmoz-omnitable-column-amount title="Amount" name="amount" value-path="amount">
 				</cosmoz-omnitable-column-amount>
-				<cosmoz-omnitable-column-date title="Date" name="date" value-path="date" editable>
+				<cosmoz-omnitable-column-date title="Date" name="date" value-path="date" locale="en-US" editable>
 				</cosmoz-omnitable-column-date>
 				<cosmoz-omnitable-column-datetime title="Datetime" name="datetime" value-path="date" editable>
 				</cosmoz-omnitable-column-datetime>
@@ -41,15 +41,15 @@
 		const data = [
 			{ age: 17,
 				amount: { amount: '12.4', currency: 'USD' },
-				date: '2023 3 21',
+				date: '2023-03-21T00:00:00Z',
 				time: ''
 			},
 			{ amount: { amount: 2 },
-				date: new Date('2015-03-18')
+				date: new Date('2015-03-18T00:00:00Z')
 			},
 			{ age: -11,
 				amount: { amount: 678, currency: 'AUD' },
-				date: new Date(86400000), // Fri Jan 02 1970 02:00:00 GMT+0200 (EET)
+				date: new Date(86400000), // Fri Jan 02 1970
 				time: 86400000
 			},
 			{ age: 9,
@@ -61,7 +61,7 @@
 				age: 5,
 				amount: { amount: '3450', currency: 'DKK' },
 				date: new Date('2016-08-27'),
-				time: '08/27/2016 14:34:56'
+				time: '2016-08-27T14:34:56Z'
 			}
 		];
 
@@ -86,17 +86,17 @@
 			});
 
 			test('toDate converts an value to valid date', function (done) {
-				assert.equal(column.toDate(data[0].date).getTime(), (new Date('2023 3 21')).getTime());
-				assert.equal(column.toDate(data[1].date).getTime(), (new Date('2015-03-18')).getTime());
-				assert.equal(column.toDate(data[2].date).getTime(), (new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)')).getTime());
+				assert.equal(column.toDate(data[0].date).getTime(), new Date('2023-03-21T00:00:00Z').getTime());
+				assert.equal(column.toDate(data[1].date).getTime(), new Date('2015-03-18T00:00:00Z').getTime());
+				assert.equal(column.toDate(data[2].date).getTime(), new Date(Date.UTC(1970, 0, 2)).getTime());
 				done();
 			});
 
 			test('toDate limits parameters', function (done) {
-				assert.equal(column.toDate(data[0].date, '2023 4 21', Math.min), (new Date('2023 3 21')).getTime()); // min
-				assert.equal(column.toDate(data[1].date, '2053 4 21', Math.min), (new Date('2015-03-18')).getTime()); // min
-				assert.equal(column.toDate(data[0].date, (new Date('2023 4 21')).getTime(), Math.max), (new Date('2023 4 21')).getTime()); //max
-				assert.equal(column.toDate(data[1].date, '2017-03-18').getTime(), (new Date('2015-03-18')).getTime()); // missing limitFunc returns date
+				assert.equal(column.toDate(data[0].date, '2023-03-21T00:00:00Z', Math.min), (new Date('2023-03-21T00:00:00Z')).getTime()); // min
+				assert.equal(column.toDate(data[1].date, '2053-04-21T00:00:00Z', Math.min), (new Date('2015-03-18T00:00:00Z')).getTime()); // min
+				assert.equal(column.toDate(data[0].date, (new Date('2023-04-21T00:00:00Z')).getTime(), Math.max), (new Date('2023-04-21T00:00:00Z')).getTime()); //max
+				assert.equal(column.toDate(data[1].date, '2017-03-18T00:00:00Z').getTime(), (new Date('2015-03-18T00:00:00Z')).getTime()); // missing limitFunc returns date
 				done();
 			});
 
@@ -128,8 +128,8 @@
 					min: data[1].date,
 					max: data[0].date
 				};
-				assert.equal(column._filterInput.min, '2015-03-18');
-				assert.equal(column._filterInput.max, '2023-03-21');
+				assert.equal(new Date(column._filterInput.min).getTime(), new Date('2015-03-18T00:00:00Z').getTime());
+				assert.equal(new Date(column._filterInput.max).getTime(), new Date('2023-03-21T00:00:00Z').getTime());
 				done();
 			});
 
@@ -137,20 +137,20 @@
 				assert.isNull(column._filterInput.min);
 				assert.isNull(column._filterInput.max);
 				column._filterInput = {
-					min: '2015-03-18',
-					max: '2023-03-21'
+					min: '2015-03-18T00:00:00Z',
+					max: '2023-03-21T00:00:00Z'
 				};
 				Polymer.Base.async(function () {
-					assert.equal(column.filter.min.getTime(), new Date('2015-03-18').getTime());
-					assert.equal(column.filter.max.getTime(), new Date('2023-03-21').getTime());
+					assert.equal(column.filter.min.getTime(), new Date('2015-03-18T00:00:00Z').getTime());
+					assert.equal(column.filter.max.getTime(), new Date('2023-03-21T00:00:00Z').getTime());
 					done();
 				}, 650);
 			});
 
 			test('changing only _filterInput min updates filter min', function (done) {
-				column._filterInput.min = '2015-08-27';
+				column._filterInput.min = '2015-08-27T00:00:00Z';
 				Polymer.Base.async(function () {
-					assert.equal(column.filter.min.getTime(), new Date('2015-08-27').getTime());
+					assert.equal(column.filter.min.getTime(), new Date('2015-08-27T00:00:00Z').getTime());
 					done();
 				}, 650);
 			});
@@ -233,41 +233,40 @@
 			test('time toDate converts timestamp to valid date', function (done) {
 				assert.equal(column.toDate(data[0].time), null);
 				assert.equal(column.toDate(data[1].time), null);
-				assert.equal(column.toDate(data[2].time).getTime(), new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)').getTime());
+				assert.equal(column.toDate(data[2].time).getTime(), new Date(Date.UTC(1970, 0, 2)).getTime());
 				assert.isNull(column.toDate(data[3].time));
 				done();
 			});
 
 			test('time toDate accepts time as string and converts it to date', function (done) {
-				assert.equal(column.toDate(data[4].time).getTime(), (new Date('08/27/2016 14:34:56')).getTime());
+				assert.equal(column.toDate(data[4].time).getTime(), new Date(Date.UTC(2016, 7, 27, 14, 34, 56)).getTime());
 				done();
 			});
 
 			test('time toDate limits parameters', function (done) {
-				assert.equal(column.toDate(data[2].time, '2023 4 21 04:00:00', Math.min), (new Date('Fri Jan 02 1970 02:00:00 GMT+0200 (EET)')).getTime()); // min
-				assert.equal(column.toDate(data[2].time, '2053 4 21 11:23:32', Math.max), (new Date('2053 4 21 11:23:32')).getTime()); // max
-				assert.equal(column.toDate(data[4].time, (new Date('2023 4 21 04:00:00')).getTime(), Math.min), (new Date('08/27/2016 14:34:56')).getTime()); //min
-				assert.equal(column.toDate(data[4].time, (new Date('2023 4 21 11:23:32')).getTime(), Math.max), (new Date('2023 4 21 11:23:32')).getTime()); //max
-				assert.equal(column.toDate(data[4].time, '2017-03-18 11:23:32').getTime(), (new Date('08/27/2016 14:34:56')).getTime()); // missing limitFunc returns date
+				assert.equal(column.toDate(data[2].time, '2023-04-21T04:00:00Z', Math.min), new Date(Date.UTC(1970, 0, 2)).getTime()); // min
+				assert.equal(column.toDate(data[2].time, '2053-04-21T11:23:32Z', Math.max), new Date('2053-04-21T11:23:32Z').getTime()); // max
+				assert.equal(column.toDate(data[4].time, (new Date('2023-04-21T04:00:00Z')).getTime(), Math.min), new Date(Date.UTC(2016, 7, 27, 14, 34, 56)).getTime()); //min
+				assert.equal(column.toDate(data[4].time, (new Date('2023-04-21T11:23:32Z')).getTime(), Math.max), new Date('2023-04-21T11:23:32Z').getTime()); //max
+				assert.equal(column.toDate(data[4].time, '2017-03-18T11:23:32Z').getTime(), new Date(Date.UTC(2016, 7, 27, 14, 34, 56)).getTime()); // missing limitFunc returns date
 				done();
 			});
 
 			test('time toDate accepts limit as timestamp', function (done) {
-				assert.equal(column.toDate(new Date('Fri Jan 02 2029 02:00:00 GMT+0200 (EET)'), data[2].time, Math.min), data[2].time);
-				// assert.equal(column.toDate(new Date('Fri Jan 02 2029 02:00:00 GMT+0200 (EET)'), data[3].time, Math.min).getTime(), data[3].time); limit as string - timestamp
+				assert.equal(column.toDate(new Date(Date.UTC(2029, 0, 2)), data[2].time, Math.min), data[2].time);
 				done();
 			});
 
 			test('time getComparableValue returns right value', function (done) {
 				assert.equal(column.getComparableValue(data[2], 'time'), 0, 'Expected to parse time from miliseconds timestamp as number');
-				assert.equal(column.getComparableValue(data[4], 'time'), 45296000);
+				assert.equal(column.getComparableValue(data[4], 'time'), 56096000);
 				done();
 			});
 
 			test('time _toInputString returns local ISO string', function (done) {
 				assert.equal(column._toInputString(), null);
 				assert.equal(column._toInputString(data[2].time), '02:00:00');
-				assert.equal(column._toInputString(data[4].time), '14:34:56');
+				assert.equal(column._toInputString(data[4].time), '17:34:56');
 				done();
 			});
 
@@ -284,7 +283,7 @@
 					max: data[4].time
 				};
 				assert.equal(column._filterInput.min, '02:00:00');
-				assert.equal(column._filterInput.max, '14:34:56');
+				assert.equal(column._filterInput.max, '17:34:56');
 				done();
 			});
 
@@ -296,8 +295,8 @@
 					max: '14:34:56'
 				};
 				Polymer.Base.async(function () {
-					assert.equal(column.filter.min.getTime(), new Date('Thu, 01 Jan 1970 01:10:00 GMT').getTime());
-					assert.equal(column.filter.max.getTime(), new Date('Thu, 01 Jan 1970 12:34:56 GMT').getTime());
+					assert.equal(column.filter.min.getTime(), new Date(Date.UTC(1970, 0, 1, 1, 10)).getTime());
+					assert.equal(column.filter.max.getTime(), new Date(Date.UTC(1970, 0, 1, 12, 34, 56)).getTime());
 					done();
 				}, 650);
 			});
@@ -305,7 +304,7 @@
 			test('changing only _filterInput min updates filter min', function (done) {
 				column._filterInput.min = '04:21:10';
 				Polymer.Base.async(function () {
-					assert.equal(column.filter.min.getTime(), new Date('Thu, 01 Jan 1970 02:21:10 GMT').getTime());
+					assert.equal(column.filter.min.getTime(), new Date(Date.UTC(1970, 0, 1, 2, 21, 10)).getTime());
 					done();
 				}, 650);
 			});
