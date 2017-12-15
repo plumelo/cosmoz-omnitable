@@ -104,24 +104,26 @@
 			/**
 			 * Converts a value to an amount object optionaly limiting it.
 			 *
-			 * @param  {Object|*} value  The value to convert to number
-			 * @param  {Object|*} limit  The value used to limit the number
+			 * @param  {Object} value  The value to convert to number
+			 * @param  {Object} limit  The value used to limit the number
 			 * @param  {Function} limitFunc  The function used to limit the number (Math.min|Math.max)
 			 * @returns {Object|void}    Value converted to Number or void
 			 */
 			toAmount(value, limit, limitFunc) {
-				if (value == null || value === '') {
+				if (value == null || value === '' || !typeof value === ' object' || value.currency == null || value.currency === '') {
+					console.log('Invalid amount: ', value);
 					return;
 				}
-				const number = this.toNumber(typeof value === 'object' ? value.amount : value);
+				const number = this.toNumber(value.amount);
 				if (Number.isNaN(number)) {
 					return;
 				}
 				let amount = {
-						currency: value.currency || this.defaultCurrency,
+						currency: value.currency,
 						amount: number
 					},
-					lAmount;
+					lAmount,
+					lNumber;
 
 				if (limitFunc == null || limit == null) {
 					return amount;
@@ -130,9 +132,10 @@
 				if (lAmount == null) {
 					return amount;
 				}
-				return Object.assign(amount, {
-					amount: this.toNumber(amount.amount, lAmount.amount, limitFunc)
-				});
+
+				lNumber = this.toNumber(amount.amount, lAmount.amount, limitFunc);
+				console.log('toAmount: ', lNumber === number ? amount : lAmount);
+				return lNumber === number ? amount : lAmount;
 			},
 
 			toValue() {
@@ -207,6 +210,17 @@
 				}
 				return this.toNumber(amount.amount);
 			},
+
+			_fromInputString(value, property) {
+				const number = this.toNumber(value);
+				if (number == null) {
+					return;
+				}
+				return this.toValue({
+					amount: number,
+					currency: property && this.get(['filter', property, 'currency']) || this.defaultCurrency
+				});
+			}
 		});
 
 	</script>
