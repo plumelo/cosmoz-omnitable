@@ -183,40 +183,33 @@
 				done();
 			});
 
-			test('toAmount returns default currency', function (done) {
-				assert.equal(column.toAmount(123).currency, 'SEK');
-				assert.equal(column.toAmount({amount: 23}).currency, 'SEK');
-				done();
-			});
+			test('toAmount returns a valid amount', function (done) {
+				assert.isNull(column.toAmount());
+				assert.isNull(column.toAmount('123'));
+				assert.isNull(column.toAmount({amount: 123}));
+				assert.isNull(column.toAmount({amount: '123'}));
+				assert.isNull(column.toAmount({currency: 'USD'}));
 
-			test('toAmount returns the specificated currency', function (done) {
-				assert.equal(column.toAmount(data[0].amount).currency, 'USD');
-				assert.equal(column.toAmount(data[2].amount).currency, 'AUD');
-				assert.equal(column.toAmount(data[3].amount).currency, 'EUR');
-				done();
-			});
-
-			test('toAmount converts a amount to a number', function (done) {
-				assert.equal(column.toAmount(123).amount, 123);
-				assert.equal(column.toAmount('2300').amount, 2300);
-				assert.isObject(column.toAmount(data[0].amount)); // amount is Object
-				assert.equal(column.toAmount(data[0].amount).amount, 12.4); // string value to number
+				assert.isObject(column.toAmount({amount: 75, currency: 'SEK'}));
+				assert.deepEqual(column.toAmount({amount: 123, currency: 'AUD'}), {amount: 123, currency: 'AUD'});
+				assert.deepEqual(column.toAmount({amount: '2300', currency: 'USD'}), {amount: 2300, currency: 'USD'});
+				assert.deepEqual(column.toAmount({amount: 99, currency: 'SEK'}), {amount: 99, currency: 'SEK'});
 				done();
 			});
 
 			test('toAmount limits parameters value', function (done) {
-				assert.equal(column.toAmount('-2.0014', 4).amount, -2.0014);
-				assert.equal(column.toAmount(3, 2, Math.min).amount, 2);
-				assert.equal(column.toAmount('23.3', '-10.5443', Math.min).amount, -10.5443);
-				assert.equal(column.toAmount(3, '2.0014', Math.min).amount, 2.0014);
-				assert.equal(column.toAmount(3, 2.0014, Math.max).amount, 3);
+				assert.equal(column.toAmount({amount: '-2.0014', currency: 'SEK'}, 4).amount, -2.0014);
+				assert.equal(column.toAmount({amount: 3, currency: 'EUR'}, {amount: 2, currency: 'EUR'}, Math.min).amount, 2);
+				assert.equal(column.toAmount({amount: '23.3', currency: 'AUD'}, {amount: '-10.5443', currency: 'AUD'}, Math.min).amount, -10.5443);
+				assert.equal(column.toAmount({amount: 15.3, currency: 'DKK'}, {amount: '2.0014', currency: 'DKK'}, Math.min).amount, 2.0014);
+				assert.equal(column.toAmount({amount: 1592, currency: 'SEK'}, {amount: 2.0014, currency: 'SEK'}, Math.max).amount, 1592);
 				done();
 			});
 
 			test('returns comparable value', function (done) {
 				assert.equal(column.getComparableValue(data[3], 'amount'), -8);
 				assert.equal(column.getComparableValue(data[4], 'amount'), 3450);
-				assert.equal(column.getComparableValue({amount: '13'}), 13);
+				assert.equal(column.getComparableValue({amount: '13', currency: 'EUR'}), 13);
 				assert.isUndefined(column.getComparableValue({}));
 				assert.isUndefined(column.getComparableValue([]));
 				done();
