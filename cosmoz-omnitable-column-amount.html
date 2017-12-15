@@ -110,13 +110,17 @@
 			 * @returns {Object|void}    Value converted to Number or void
 			 */
 			toAmount(value, limit, limitFunc) {
-				if (value == null || value === '' || !typeof value === ' object' || value.currency == null || value.currency === '') {
-					console.log('Invalid amount: ', value);
+				if (value == null || value === '') {
 					return;
 				}
+
+				if (typeof value !== 'object' || value.currency == null || value.currency === '') {
+					return null;
+				}
+
 				const number = this.toNumber(value.amount);
 				if (Number.isNaN(number)) {
-					return;
+					return null;
 				}
 				let amount = {
 						currency: value.currency,
@@ -134,7 +138,6 @@
 				}
 
 				lNumber = this.toNumber(amount.amount, lAmount.amount, limitFunc);
-				console.log('toAmount: ', lNumber === number ? amount : lAmount);
 				return lNumber === number ? amount : lAmount;
 			},
 
@@ -153,6 +156,16 @@
 				}
 				return this.toNumber(value.amount);
 			},
+			getString(item, valuePath = this.valuePath) {
+				const value = this.toValue(this.get(valuePath, item));
+				if (value === undefined) {
+					return '';
+				}
+				if (value === null) {
+					return 'Invalid value';
+				}
+				return this.renderValue(value);
+			},
 
 			getCurrency(item, valuePath) {
 				const value = this.get(valuePath, item);
@@ -160,11 +173,11 @@
 			},
 
 			renderValue(value, _formatters = this._formatters) {
-				let isEmpty = obj => !Object.keys(obj).length > 0 || !obj.currency;
-				if (!value || isEmpty(value) || !_formatters) {
-					return 'Invalid value';
+				const amount = this.toAmount(value);
+				if (amount == null) {
+					return '';
 				}
-				const formatter = _formatters[value.currency];
+				let formatter = _formatters[amount.currency];
 				if (!formatter) {
 					console.warn('formatter not found');
 					return '';
@@ -206,6 +219,27 @@
 					amount: number,
 					currency: property && this.get(['filter', property, 'currency']) || this.defaultCurrency
 				});
+			},
+
+			_toHashString(value) {
+				if (!value) {
+					return '';
+				}
+				return value.amount + value.currency;
+			},
+
+			_fromHashString(value) {
+				if (value == null || value === '') {
+					return;
+				}
+				const params = value.match(/^(-?[\d]+)([\D]+?)$/i);
+				if (!Array.isArray(params) || params.length < 0) {
+					return null;
+				}
+				return {
+					amount: params[1],
+					currency: params[2]
+				};
 			}
 		});
 
