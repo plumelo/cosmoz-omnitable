@@ -133,19 +133,22 @@
 		},
 
 		_computeRange(change) {
-			const values = change.base,
-				comparableValues = Array.isArray(values) && values.length && values.map(i => this.getComparableValue(i)).filter(n => n != null);
+			const allValues = change.base,
+				values = Array.isArray(allValues) && allValues.length
+				&& allValues.map(v => this.toValue(v)).filter(n => n != null);
 
-			if (!comparableValues || comparableValues.length < 1) {
+			if (!values || values.length < 1) {
 				return {
 					min: null,
 					max: null
 				};
 			}
-			return {
-				min: this.toValue(Math.min.apply(null, comparableValues)),
-				max: this.toValue(Math.max.apply(null, comparableValues))
-			};
+			return values.reduce((p, n) => {
+				return {
+					min: this.toValue(n, p.min, Math.min),
+					max: this.toValue(n, p.max, Math.max)
+				};
+			}, {});
 		},
 
 		_computeLimit(range, inputChange, min, max) {
@@ -244,10 +247,10 @@
 			const input = this._filterInput,
 				path = this.__inputChangePath,
 				limit = this._limit,
-				min = this._fromInputString(input.min),
-				max = this._fromInputString(input.max),
-				lMin = this.toValue(input.min, limit.fromMax, Math.min),
-				lMax = this.toValue(input.max, limit.toMin, Math.max);
+				min = this._fromInputString(input.min, 'min'),
+				max = this._fromInputString(input.max, 'max'),
+				lMin = this.toValue(min, limit.fromMax, Math.min),
+				lMax = this.toValue(max, limit.toMin, Math.max);
 
 			if (this.getComparableValue(lMin) === this.getComparableValue(min)
 				&& this.getComparableValue(lMax) === this.getComparableValue(max)) {
@@ -255,8 +258,8 @@
 			}
 			this.__inputChangePath = null;
 			this.set('_filterInput', {
-				min: !path || path === 'min' ? this._toInputString(lMin) : min,
-				max: !path || path === 'max' ? this._toInputString(lMax) : max
+				min: this._toInputString(!path || path === 'min' ? lMin : min),
+				max: this._toInputString(!path || path === 'max' ? lMax : max)
 			});
 			this.flushDebouncer('_limitInput');
 		},
@@ -264,8 +267,8 @@
 		_updateFilter() {
 			const input = this._filterInput,
 				filter = this.filter,
-				min = this._fromInputString(input.min),
-				max = this._fromInputString(input.max);
+				min = this._fromInputString(input.min, 'min'),
+				max = this._fromInputString(input.max, 'max');
 
 			if (this.getComparableValue(min) === this.getComparableValue(filter, 'min')
 				&& this.getComparableValue(max) === this.getComparableValue(filter, 'max')
@@ -277,11 +280,16 @@
 		},
 
 		_filterChanged(change) {
+			if (this._filterInput == null) {
+				return;
+			}
 			const input = this._filterInput,
-				filter = change.base;
+				filter = change.base,
+				min = this._fromInputString(input.min, 'min'),
+				max = this._fromInputString(input.max, 'max');
 
-			if (this.getComparableValue(input, 'min') === this.getComparableValue(filter, 'min')
-				&& this.getComparableValue(input, 'max') === this.getComparableValue(filter, 'max')
+			if (this.getComparableValue(min) === this.getComparableValue(filter, 'min')
+				&& this.getComparableValue(max) === this.getComparableValue(filter, 'max')
 			) {
 				return;
 			}
