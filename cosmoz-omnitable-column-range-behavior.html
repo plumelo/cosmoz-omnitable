@@ -177,8 +177,8 @@
 				nMax = this.toValue(max);
 			return {
 				fromMin: nMin != null ? nMin : this.toValue(range.min),
-				fromMax: this.toValue(range.max, input.max, Math.min),
-				toMin: this.toValue(range.min, input.min, Math.max),
+				fromMax: this.toValue(range.max, this._fromInputString(input.max, 'max'), Math.min),
+				toMin: this.toValue(range.min, this._fromInputString(input.min, 'min'), Math.max),
 				toMax: nMax != null ? nMax : this.toValue(range.max)
 			};
 		},
