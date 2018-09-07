@@ -401,12 +401,24 @@
 			this._debounceAdjustColumns();
 		},
 
-		_dataChanged() {
+		_dataChanged(change) {
 			if (!Array.isArray(this.columns)) {
 				return;
 			}
-			this._setColumnValues();
-			this._debounceFilterItems();
+			const {value, path, base} = change;
+			const match = path.match(/data\.(\d)\.(.+)$/i);
+			if (match) {
+				const index = match[1];
+				const subpath = match[2];
+				const itemIndex = this.sortedFilteredGroupedItems.indexOf(base[index]);
+				if (itemIndex < 0) {
+					return;
+				}
+				this.notifyPath(`sortedFilteredGroupedItems.${itemIndex}.${subpath}`, value, true);
+			} else {
+				this._setColumnValues();
+				this._debounceFilterItems();
+			}
 		},
 
 		_debounceUpdateColumns() {

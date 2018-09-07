@@ -98,6 +98,7 @@
 		},
 
 		_itemUpdated: function (itemChange) {
+			console.log('item updated', itemChange);
 			if (itemChange.path === 'item') {
 				this.elements.forEach(function (element) {
 					this._forwardProperty(this.getElementTemplateInstance(element), 'item', itemChange.value, true);
